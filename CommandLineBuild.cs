@@ -14,6 +14,7 @@ namespace Nordeus.Build
 		private const string BuildVersionCommand = "-buildVersion";
 		private const string BuildReporterCommand = "-reporter";
 		private const string BuildTargetCommand = "-target";
+		private const string BuildDevelCommand = "-development";
 		private const string AndroidTextureCompressionCommand = "-textureCompression";
 
 		private const char CommandStartCharacter = '-';
@@ -27,7 +28,7 @@ namespace Nordeus.Build
 		/// </summary>
 		private static void Build()
 		{
-			string publishPath, buildNumber, buildVersion, buildReporter, buildTarget, androidTextureCompression;
+			string publishPath, buildNumber, buildVersion, buildReporter, buildTarget, androidTextureCompression, buildDevel;
 
 			Dictionary<string, string> commandToValueDictionary = GetCommandLineArguments();
 
@@ -38,7 +39,7 @@ namespace Nordeus.Build
 			commandToValueDictionary.TryGetValue(BuildReporterCommand, out buildReporter);
 			commandToValueDictionary.TryGetValue(BuildTargetCommand, out buildTarget);
 			commandToValueDictionary.TryGetValue(AndroidTextureCompressionCommand, out androidTextureCompression);
-
+			commandToValueDictionary.TryGetValue(BuildDevelCommand, out buildDevel);
 
 			if (!string.IsNullOrEmpty(buildReporter)) BuildReporter.Current = BuildReporter.CreateReporterByName(buildReporter);
 
@@ -60,12 +61,16 @@ namespace Nordeus.Build
 				else
 				{
 					BuildTarget parsedBuildTarget = (BuildTarget)Enum.Parse(typeof(BuildTarget), buildTarget);
+
+					bool devBuild = false;
+					if (!string.IsNullOrEmpty(buildDevel)) devBuild = (buildDevel.Equals("1"));
+
 					MobileTextureSubtarget? parsedTextureSubtarget = null;
 					if (!string.IsNullOrEmpty(androidTextureCompression)) parsedTextureSubtarget = (MobileTextureSubtarget)Enum.Parse(typeof(MobileTextureSubtarget), androidTextureCompression);
 
 					BundleVersionResolver.Setup(parsedBuildTarget);
 
-					Builder.Build(parsedBuildTarget, publishPath, parsedTextureSubtarget);
+					Builder.Build(parsedBuildTarget, publishPath, parsedTextureSubtarget, devBuild);
 				}
 			}
 			catch (Exception e)

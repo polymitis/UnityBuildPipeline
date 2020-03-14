@@ -7,12 +7,6 @@ namespace Nordeus.Build
 	/// </summary>
 	public static class BundleVersionResolver
 	{
-#if !UNITY_5
-		private const BuildTarget IosTarget = BuildTarget.iPhone;
-#else
-		private const BuildTarget IosTarget = BuildTarget.iOS;
-#endif
-
 		/// <summary>
 		/// Pretty version of the game, for example 0.123f
 		/// </summary>
@@ -33,22 +27,13 @@ namespace Nordeus.Build
 			{
 				SetupAndroid();
 			}
-			else if (target == IosTarget)
+			else if (target == BuildTarget.iOS)
 			{
 				SetupIos();
 			}
 		}
 
-#if !UNITY_5_2
-		private static void SetupIos()
-		{
-			if (BuildNumber != null)
-			{
-				PlayerSettings.bundleVersion = BuildNumber.Value.ToString();
-			}
-		}
-#else
-		private static void SetupIos()
+        private static void SetupIos()
 		{
 			if (PrettyVersion != null)
 			{
@@ -60,7 +45,6 @@ namespace Nordeus.Build
 				PlayerSettings.iOS.buildNumber = BuildNumber.Value.ToString();
 			}
 		}
-#endif
 
 		private static void SetupAndroid()
 		{
